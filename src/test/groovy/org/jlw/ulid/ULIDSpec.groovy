@@ -4,7 +4,7 @@ import spock.lang.Specification
 
 import java.time.LocalDateTime
 
-class ULIDTest extends Specification {
+class ULIDSpec extends Specification {
     def "bad string #value"() {
         when:
         ULID.of(value)
@@ -18,6 +18,38 @@ class ULIDTest extends Specification {
                 '',
                 '   ',
                 '                          ',
+                '8ZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                '9ZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'AZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'BZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'CZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'DZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'EZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'FZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'GZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'HZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'JZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'KZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'MZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'NZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'PZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'QZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'RZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'SZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'TZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'VZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'WZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'XZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'YZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                'ZZZZZZZZZZZZZZZZZZZZZZZZZZ',
+                '01F99GM3AAFN3KR86D6JGPKXPI',
+                '01F99GM3AJ5Q1G13PFWMR8WN3i',
+                '01F99GM3AKF17ECK3WTXB6VMSL',
+                '01F99GM3AKGWVZ3Y7GR5NWHVEl',
+                '01F99GM3AKMQ5TPF65BD85CB3O',
+                '01F99GM3AM41J2GN3DTVN5YAKo',
+                '01F99GM3AMPYXJNMGPWP14J0KU',
+                '01F99GM3AM1JN13NEAQ3ARG77u',
         ]
     }
 
@@ -111,7 +143,7 @@ class ULIDTest extends Specification {
 
     def "not equal to null"() {
         expect:
-        !ULID.randomULID().equals(null)
+        ULID.randomULID() != null
     }
 
     def "hashCode #iteration"() {
@@ -126,7 +158,7 @@ class ULIDTest extends Specification {
         expect:
         var ulid = ULID.randomULID()
 
-        ulid.equals(ulid)
+        ulid == ulid
 
         where:
         iteration << (1..10_000)
@@ -152,5 +184,77 @@ class ULIDTest extends Specification {
 
         expect:
         ulidMost > ulidLeast
+    }
+
+    def "bits #value"() {
+        when:
+        var ulid = ULID.of(value)
+
+        then:
+        ulid.getMostSignificantBits() == msb
+        ulid.getLeastSignificantBits() == lsb
+
+        where:
+        [value, msb, lsb] << [
+                ["01F99HJBJ384MW83WGSWVYE52N", 106488908812075305, -4319074297954495403],
+                ["01F99HJBJ9A3S5PDM9QPAM4MGM", 106488908812472562, 6572592153539793428],
+                ["01F99HJBJAZN26Z8VS8DAQQQX1", 106488908812582212, 8044406689517789089],
+                ["01F99HJBJA7BM8K7D7PJGVZ849", 106488908812532456, -8530477724920209271],
+                ["01F99HJBJA73MQQ397NA7KHRTE", 106488908812531945, 8902815651882132302],
+                ["01F99HJBJAZ0X6JNX61B5442NC", 106488908812580922, 7590718262229469868],
+                ["01F99HJBJAXXDCMZNT6BDBKAQV", 106488908812578650, -3855439503401833733],
+                ["01F99HJBJA6ZMX65BZEE8XAQAJ", 106488908812531689, -3236540622851187374],
+                ["01F99HJBJACF9SH0C6CEBHPXEH", 106488908812542931, -7457531745653787183],
+                ["01F99HJBJARDDY4TDJW31M6R6D", 106488908812567387, -2131976270164827955],
+                ["01F99HJBJAKVAD4NBZM6C2F1SH", 106488908812558036, -3290583620705089743],
+                ["01F99HJBJBC41DZ9N469H4KZ09", 106488908812607746, -2330995220813317111],
+                ["01F99HJBJB2ZPZT51XQZ117GKG", 106488908812589037, -210475388775447952],
+                ["01F99HJBJB6XFFTAJXFG8BZJN5", 106488908812597086, -204248045653603675],
+                ["01F99HJBJBN0DBSCHPGZDNRE2J", 106488908812625946, -4849753891595863982],
+                ["01F99HJBJC3JFJ0TTBGQEK1GJ3", 106488908812655775, 2336043870035427907],
+                ["01F99HJBJCBJT3ARC5HH16P441", 106488908812672180, 3846502394207342721],
+                ["01F99HJBJC9XHJR5EF6YCEFXQ1", 106488908812668771, 3176672949875242721],
+        ]
+    }
+
+    def "monotonicity"() {
+        given:
+        var values = (1..10_000).collect { ULID.randomULID() }
+
+        and:
+        def counts = [:]
+        var map = values.groupBy { it.timestamp() }
+                .each { timestamp, list ->
+                    counts[list.size()] = timestamp
+                }
+
+        and:
+        var ulids = map[counts.max { entry -> entry.getKey() }.getValue()]
+
+        expect:
+        ulids == ulids.sort(false)
+        map.forEach((timestamp, list) -> {
+            list.sort(ULID::compareTo)
+
+            BigInteger value = null
+
+            for (final ULID id : list) {
+                final BigInteger next = new BigInteger(id.entropy())
+
+                if (value != null) {
+                    value.add(BigInteger.ONE) == next
+                } // if
+
+                value = next
+            } // for
+        })
+    }
+
+    def "null comparison"() {
+        when:
+        ULID.randomULID().compareTo(null)
+
+        then:
+        thrown(NullPointerException.class)
     }
 }
