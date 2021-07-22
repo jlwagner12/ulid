@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="EncoderPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSSXXX, UTC} %magenta([%-15.15t]) %highlight(%-5level) %cyan(%-60.60logger{60}) : %msg%n"/>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <Pattern>${EncoderPattern}</Pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
