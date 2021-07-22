@@ -8,6 +8,6 @@ import io.cucumber.junit.CucumberOptions;
 @RunWith(Cucumber.class)
 @CucumberOptions(features = "classpath:feature-tests",
 		glue = "org.jlw.ulid")
-class RunnerTest
+class Runner
 {
 }
