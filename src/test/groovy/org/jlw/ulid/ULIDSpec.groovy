@@ -171,7 +171,31 @@ class ULIDSpec extends Specification {
         ulid == ulid
 
         where:
-        iteration << (1..10_000)
+        iteration << (1..1000)
+    }
+
+    def "equals branches"(final long msb1, final long lsb1, final long msb2, final long lsb2, final boolean result) {
+        given:
+        var ulid1 = new ULID(msb1, lsb1)
+
+        and:
+        var ulid2 = new ULID(msb2, lsb2)
+
+        expect:
+        if (result) {
+            ulid1.equals(ulid2)
+        }
+        else {
+            !ulid1.equals(ulid2)
+        }
+
+        where:
+        msb1 | lsb1 | msb2 | lsb2 | result
+        0    | 0    | 0    | 0    | true
+        0    | 0    | 1    | 0    | false
+        1    | 0    | 0    | 0    | false
+        0    | 0    | 0    | 1    | false
+        0    | 1    | 0    | 0    | false
     }
 
     def "less than"() {
