@@ -4,10 +4,9 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-
-import lombok.NonNull;
 
 /**
  * An implementation of the <a href="https://github.com/ulid/spec">ULID</a> specification.
@@ -127,9 +126,7 @@ public final class ULID implements Comparable<ULID>
 	 */
 	public static ULID randomULID()
 	{
-		final ULIDState state = ULID.state.updateAndGet(ULIDState::new);
-
-		return new ULID((state.timestamp << 16) | state.msb, state.lsb);
+		return ULID.state.updateAndGet(ULIDState::nextValue).createULID();
 	}
 
 	/**
@@ -373,10 +370,11 @@ public final class ULID implements Comparable<ULID>
 	 *        {@code ULID} to which this {@code ULID} is to be compared
 	 * @return {@code -1}, {@code 0} or {@code 1} as this {@code ULID} is less than, equal to, or greater than {@code
 	 * 		rhs}, respectively.
+	 * @throws NullPointerException if the specified object is null
 	 */
-	public int compareTo(@NonNull final ULID rhs)
+	public int compareTo(final ULID rhs)
 	{
-		int r = Long.compareUnsigned(msb, rhs.msb);
+		int r = Long.compareUnsigned(msb, Objects.requireNonNull(rhs).msb);
 
 		if (r == 0)
 		{
@@ -398,35 +396,44 @@ public final class ULID implements Comparable<ULID>
 
 		final long lsb;
 
-		public ULIDState()
+		private ULIDState()
 		{
-			final byte[] entropy = new byte[10];
-
-			timestamp = System.currentTimeMillis() & MAX_TIME;
-			numberGenerator.nextBytes(entropy);
-			msb = getMostSignificantBitsFromEntropy(entropy);
-			lsb = getLeastSignificantBitsFromEntropy(entropy);
+			this(System.currentTimeMillis() & MAX_TIME, createEntropy());
 		}
 
-		public ULIDState(final ULIDState previous)
+		private ULIDState(final long timestamp, final byte[] entropy)
 		{
-			timestamp = System.currentTimeMillis() & MAX_TIME;
+			this(timestamp, getMostSignificantBitsFromEntropy(entropy), getLeastSignificantBitsFromEntropy(entropy));
+		}
+
+		private ULIDState(final long timestamp, final long msb, final long lsb)
+		{
+			this.timestamp = timestamp;
+			this.msb = msb;
+			this.lsb = lsb;
+		}
+
+		private static ULIDState nextValue(final ULIDState previous)
+		{
+			return nextValue(previous, System.currentTimeMillis() & MAX_TIME);
+		}
+
+		private static ULIDState nextValue(final ULIDState previous, final long timestamp)
+		{
 			if (previous.timestamp != timestamp)
 			{
-				final byte[] entropy = new byte[10];
-
-				numberGenerator.nextBytes(entropy);
-				msb = getMostSignificantBitsFromEntropy(entropy);
-				lsb = getLeastSignificantBitsFromEntropy(entropy);
+				return new ULIDState(timestamp, createEntropy());
 			}
 			else
 			{
-				lsb = previous.lsb + 1;
+				final long lsb = previous.lsb + 1;
+
 				if (lsb == 0)
 				{
 					// if lsb is zero, then we have added one and wrapped the
 					// limits of a long, so we need to increment msb
-					msb = previous.msb + 1;
+					final long msb = previous.msb + 1;
+
 					if (msb > ENTROPY_MSB_MASK)
 					{
 						// if more than 16 bits are present, then we have
@@ -440,12 +447,18 @@ public final class ULID implements Comparable<ULID>
 						throw new IllegalStateException(
 								"overflow; too many random ULIDs generated within the same millisecond");
 					} // if
-				}
-				else
-				{
-					msb = previous.msb;
 				} // if
+
+				return new ULIDState(timestamp, previous.msb, lsb);
 			} // if
+		}
+
+		static byte[] createEntropy()
+		{
+			final byte[] entropy = new byte[10];
+
+			numberGenerator.nextBytes(entropy);
+			return entropy;
 		}
 
 		private static long getMostSignificantBitsFromEntropy(final byte[] entropy)
@@ -464,6 +477,11 @@ public final class ULID implements Comparable<ULID>
 					| ((entropy[7] & 0xffL) << 16)
 					| ((entropy[8] & 0xffL) << 8)
 					| (entropy[9] & 0xffL);
+		}
+
+		private ULID createULID()
+		{
+			return new ULID((timestamp << 16) | msb, lsb);
 		}
 	}
 }
