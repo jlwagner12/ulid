@@ -12,6 +12,9 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
         <ebean.version>12.8.3</ebean.version>
+        <sonar.projectKey>jlwagner12_ulid</sonar.projectKey>
+        <sonar.organization>jlwagner12</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
 
     <build>
