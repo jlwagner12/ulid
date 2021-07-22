@@ -159,7 +159,7 @@ public final class ULID implements Comparable<ULID>
 	{
 		return Optional.ofNullable(ulid)
 				.filter(v -> v.length() == ULID_LENGTH)
-				.map(v -> v.chars().noneMatch(ch -> ch > BASE32_BYTE_LUT.length || BASE32_BYTE_LUT[ch] == (byte) 0xff))
+				.map(v -> v.chars().noneMatch(n -> n >= BASE32_BYTE_LUT.length || BASE32_BYTE_LUT[n] == (byte) 0xff))
 				.map(t -> t && BASE32_BYTE_LUT[ulid.charAt(0)] < 8)
 				.orElse(false);
 	}

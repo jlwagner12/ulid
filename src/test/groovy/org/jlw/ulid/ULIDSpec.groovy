@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 class ULIDSpec extends Specification {
     def "bad string #value"() {
         when:
+        System.out.println(ULID.BASE32_BYTE_LUT.length)
         ULID.of(value)
 
         then:
@@ -50,6 +51,15 @@ class ULIDSpec extends Specification {
                 '01F99GM3AM41J2GN3DTVN5YAKo',
                 '01F99GM3AMPYXJNMGPWP14J0KU',
                 '01F99GM3AM1JN13NEAQ3ARG77u',
+                '01f99gm3aafn3kr86d6jgpkxpi',
+                '01f99gm3aj5q1g13pfwmr8wn3i',
+                '01f99gm3akf17eck3wtxb6vmsl',
+                '01f99gm3akgwvz3y7gr5nwhvel',
+                '01f99gm3akmq5tpf65bd85cb3o',
+                '01f99gm3am41j2gn3dtvn5yako',
+                '01f99gm3ampyxjnmgpwp14j0ku',
+                '01f99gm3am1jn13neaq3arg77u',
+                '01f99gm3am1jn13n' + '\u0100' + 'aq3arg77u',
         ]
     }
 
@@ -158,6 +168,7 @@ class ULIDSpec extends Specification {
         expect:
         var ulid = ULID.randomULID()
 
+        ulid.compareTo(ulid) == 0
         ulid == ulid
 
         where:
