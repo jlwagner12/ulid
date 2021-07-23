@@ -6,7 +6,34 @@
 
     <groupId>com.pci</groupId>
     <artifactId>ulid</artifactId>
-    <version>0.0.4</version>
+    <version>0.1.0</version>
+    <packaging>jar</packaging>
+
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>ULID implementation for Java with JPA/ebeans integration</description>
+    <url>http://github.com/jlwagner12/ulid</url>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>https://github.com/jlwagner12/ulid/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Jay L. Wagner</name>
+            <email>jay.l.wagner@gmail.com</email>
+            <organization>none</organization>
+            <organizationUrl>https://github.com/jlwagner12</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/jlwagner12/ulid.git</connection>
+        <developerConnection>scm:git:ssh://github.com:jlwagner12/ulid.git</developerConnection>
+        <url>http://github.com/jlwagner12/ulid/tree/master</url>
+    </scm>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -89,6 +116,41 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <tags>
+                        <tag>
+                            <name>implSpec</name>
+                            <placement>a</placement>
+                            <head>Implementation Requirements:</head>
+                        </tag>
+                    </tags>
+                </configuration>
             </plugin>
         </plugins>
     </build>

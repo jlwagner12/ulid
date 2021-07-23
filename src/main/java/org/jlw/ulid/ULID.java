@@ -1,3 +1,27 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) <YEAR> Jay L. Wagner
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ */
 package org.jlw.ulid;
 
 import java.security.SecureRandom;
@@ -124,7 +148,7 @@ public final class ULID implements Comparable<ULID>
 	 * @throws IllegalStateException
 	 * 		if the internal entropy overflows, after ~2^40 calls within the same millisecond.
 	 */
-	public static ULID randomULID()
+	public static ULID nextULID()
 	{
 		return ULID.state.updateAndGet(ULIDState::nextValue).createULID();
 	}
@@ -146,6 +170,53 @@ public final class ULID implements Comparable<ULID>
 		} // if
 
 		return new ULID(getMostSignificantBits(value), getLeastSignificantBits(value));
+	}
+
+	public static ULID of(final byte[] bytes)
+	{
+		return of(bytes, 0);
+	}
+
+	public static ULID of(final byte[] bytes, final int offset)
+	{
+		if ((Objects.requireNonNull(bytes).length - offset) < 16)
+		{
+			throw new IllegalArgumentException("byte array must have at least 16 elements");
+		} // if
+
+		final long msb = ((bytes[0] & 0xffL) << 56)
+				| ((bytes[1] & 0xffL) << 48)
+				| ((bytes[2] & 0xffL) << 40)
+				| ((bytes[3] & 0xffL) << 32)
+				| ((bytes[4] & 0xffL) << 24)
+				| ((bytes[5] & 0xffL) << 16)
+				| ((bytes[6] & 0xffL) << 8)
+				| (bytes[7] & 0xffL);
+		final long lsb = ((bytes[8] & 0xffL) << 56)
+				| ((bytes[9] & 0xffL) << 48)
+				| ((bytes[10] & 0xffL) << 40)
+				| ((bytes[11] & 0xffL) << 32)
+				| ((bytes[12] & 0xffL) << 24)
+				| ((bytes[13] & 0xffL) << 16)
+				| ((bytes[14] & 0xffL) << 8)
+				| (bytes[15] & 0xffL);
+
+		return new ULID(msb, lsb);
+	}
+
+	public static ULID of(final long[] longs)
+	{
+		return of(longs, 0);
+	}
+
+	public static ULID of(final long[] longs, final int offset)
+	{
+		if ((Objects.requireNonNull(longs).length - offset) < 2)
+		{
+			throw new IllegalArgumentException("long array must have at least two elements");
+		} // if
+
+		return new ULID(longs[0], longs[1]);
 	}
 
 	/**
@@ -246,6 +317,36 @@ public final class ULID implements Comparable<ULID>
 		final int nanos = duration.toNanosPart();
 
 		return LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
+	}
+
+	public byte[] array()
+	{
+		final byte[] bytes = new byte[16];
+
+		bytes[0] = (byte) ((msb >>> 56) & 0xff);
+		bytes[1] = (byte) ((msb >>> 48) & 0xff);
+		bytes[2] = (byte) ((msb >>> 40) & 0xff);
+		bytes[3] = (byte) ((msb >>> 32) & 0xff);
+		bytes[4] = (byte) ((msb >>> 24) & 0xff);
+		bytes[5] = (byte) ((msb >>> 16) & 0xff);
+		bytes[6] = (byte) ((msb >>> 8) & 0xff);
+		bytes[7] = (byte) (msb & 0xff);
+
+		bytes[8] = (byte) ((lsb >>> 56) & 0xff);
+		bytes[9] = (byte) ((lsb >>> 48) & 0xff);
+		bytes[10] = (byte) ((lsb >>> 40) & 0xff);
+		bytes[11] = (byte) ((lsb >>> 32) & 0xff);
+		bytes[12] = (byte) ((lsb >>> 24) & 0xff);
+		bytes[13] = (byte) ((lsb >>> 16) & 0xff);
+		bytes[14] = (byte) ((lsb >>> 8) & 0xff);
+		bytes[15] = (byte) (lsb & 0xff);
+
+		return bytes;
+	}
+
+	public long[] longArray()
+	{
+		return new long[] { msb, lsb };
 	}
 
 	/**
@@ -370,7 +471,8 @@ public final class ULID implements Comparable<ULID>
 	 *        {@code ULID} to which this {@code ULID} is to be compared
 	 * @return {@code -1}, {@code 0} or {@code 1} as this {@code ULID} is less than, equal to, or greater than {@code
 	 * 		rhs}, respectively.
-	 * @throws NullPointerException if the specified object is null
+	 * @throws NullPointerException
+	 * 		if the specified object is null
 	 */
 	public int compareTo(final ULID rhs)
 	{

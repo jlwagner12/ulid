@@ -64,7 +64,7 @@ class ULIDSpec extends Specification {
 
     def "bad cast"() {
         given:
-        var ulid = ULID.randomULID()
+        var ulid = ULID.nextULID()
 
         and:
         var value = new Long(5L)
@@ -141,7 +141,7 @@ class ULIDSpec extends Specification {
 
     def "string round trip #iteration"() {
         expect:
-        var ulid = ULID.randomULID()
+        var ulid = ULID.nextULID()
         var str = ulid.toString()
 
         ulid == ULID.of(str)
@@ -152,12 +152,12 @@ class ULIDSpec extends Specification {
 
     def "not equal to null"() {
         expect:
-        ULID.randomULID() != null
+        ULID.nextULID() != null
     }
 
     def "hashCode #iteration"() {
         expect:
-        ULID.randomULID().hashCode() != 0
+        ULID.nextULID().hashCode() != 0
 
         where:
         iteration << (1..10_000)
@@ -165,7 +165,7 @@ class ULIDSpec extends Specification {
 
     def "equality #iteration"() {
         expect:
-        var ulid = ULID.randomULID()
+        var ulid = ULID.nextULID()
 
         ulid.compareTo(ulid) == 0
         ulid == ulid
@@ -256,7 +256,7 @@ class ULIDSpec extends Specification {
 
     def "monotonicity"() {
         given:
-        var values = (1..10_000).collect { ULID.randomULID() }
+        var values = (1..10_000).collect { ULID.nextULID() }
 
         and:
         def counts = [:]
@@ -289,9 +289,104 @@ class ULIDSpec extends Specification {
 
     def "null comparison"() {
         when:
-        ULID.randomULID().compareTo(null)
+        ULID.nextULID().compareTo(null)
 
         then:
         thrown(NullPointerException.class)
+    }
+
+    def "bad long array"() {
+        when:
+        ULID.of([0] as long[])
+
+        then:
+        thrown(IllegalArgumentException.class)
+    }
+
+    def "bad long array offset"() {
+        when:
+        ULID.of([0, 0, 0] as long[], 2)
+
+        then:
+        thrown(IllegalArgumentException.class)
+    }
+
+    def "long arrays"(final long msb, final long lsb) {
+        when:
+        var ulid = new ULID(msb, lsb)
+
+        then:
+        ulid == ULID.of([msb, lsb] as long[])
+        Arrays.compare(ulid.longArray(), [msb, lsb] as long[]) == 0
+
+        where:
+        msb                | lsb
+        106488908812075305 | -4319074297954495403
+        106488908812472562 | 6572592153539793428
+        106488908812582212 | 8044406689517789089
+        106488908812532456 | -8530477724920209271
+        106488908812531945 | 8902815651882132302
+        106488908812580922 | 7590718262229469868
+        106488908812578650 | -3855439503401833733
+        106488908812531689 | -3236540622851187374
+        106488908812542931 | -7457531745653787183
+        106488908812567387 | -2131976270164827955
+        106488908812558036 | -3290583620705089743
+        106488908812607746 | -2330995220813317111
+        106488908812589037 | -210475388775447952
+        106488908812597086 | -204248045653603675
+        106488908812625946 | -4849753891595863982
+        106488908812655775 | 2336043870035427907
+        106488908812672180 | 3846502394207342721
+        106488908812668771 | 3176672949875242721
+    }
+
+    def "bad byte array"() {
+        when:
+        ULID.of([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as byte[])
+
+        then:
+        thrown(IllegalArgumentException.class)
+    }
+
+    def "bad long byte offset"() {
+        when:
+        ULID.of([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as byte[], 8)
+
+        then:
+        thrown(IllegalArgumentException.class)
+    }
+
+    def "byte arrays"(final long msb, final long lsb) {
+        when:
+        var ulid = new ULID(msb, lsb)
+
+        and:
+        var array = ulid.array()
+
+        then:
+        ulid == ULID.of(array)
+        Arrays.compare(ulid.array(), array) == 0
+
+        where:
+        msb                | lsb
+        106488908812075305 | -4319074297954495403
+        106488908812472562 | 6572592153539793428
+        106488908812582212 | 8044406689517789089
+        106488908812532456 | -8530477724920209271
+        106488908812531945 | 8902815651882132302
+        106488908812580922 | 7590718262229469868
+        106488908812578650 | -3855439503401833733
+        106488908812531689 | -3236540622851187374
+        106488908812542931 | -7457531745653787183
+        106488908812567387 | -2131976270164827955
+        106488908812558036 | -3290583620705089743
+        106488908812607746 | -2330995220813317111
+        106488908812589037 | -210475388775447952
+        106488908812597086 | -204248045653603675
+        106488908812625946 | -4849753891595863982
+        106488908812655775 | 2336043870035427907
+        106488908812672180 | 3846502394207342721
+        106488908812668771 | 3176672949875242721
     }
 }
