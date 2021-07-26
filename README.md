@@ -1,5 +1,7 @@
 # Universally Unique, Lexicographically Sortable Identifier
 
+A complete implementation of the [ULID specification](https://github.com/ulid/spec)
+
 [![Project status](https://img.shields.io/github/release/jlwagner12/ulid.svg)](https://github.com/jlwagner12/ulid/releases/latest)
 [![license](https://img.shields.io/github/license/jlwagner12/ulid.svg)](https://github.com/jlwagner12/ulid/releases/latest)
 
@@ -8,10 +10,54 @@
 [![SonarCloud Bugs](https://sonarcloud.io/api/project_badges/measure?project=jlwagner12_ulid&metric=bugs)](https://sonarcloud.io/component_measures/metric/reliability_rating/list?id=jlwagner12_ulid)
 [![SonarCloud Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jlwagner12_ulid&metric=vulnerabilities)](https://sonarcloud.io/component_measures/metric/security_rating/list?id=jlwagner12_ulid)
 
+# Usage
+
+To create a new identifier, you use `ULID.nextULID()`. To convert a `String`,
+`byte[]`, or `long[]`, you use `ULID.of(value)`.
+
+## ORM Integration
+
+The ULID implementation can be integrated for use with either Hibernate or 
+Ebeans with minimal configuration. Just use the appropriate annotations for your
+platform, and the rest should be taken care of for you.
+
+The library handles storing the ULID values in a database as either a
+26-character String (e.g. `CHAR(26)`, `VARCHAR(26)`, etc.), an array of 16
+8-bit bytes, or an array of two 64-bit longs.
+
+For either of the ORM solutions supported, you must make certain that the
+`org.jlw.ulid` package and classes are mapped appropriately.
+
+### Hibernate/Spring
+
+```java
+@Entity
+public class Client
+{
+    @Id
+    @GenericGenerator(name = UlidGenerator.GENERATOR_NAME, strategy = "org.jlw.ulid.UlidGenerator")
+    @GeneratedValue(generator = UlidGenerator.GENERATOR_NAME)  
+    @Column(name="id")
+    private ULID id;
+}
+```
+
+### Ebean ORM
+
+```java
+@Entity
+public class Client
+{
+    @Id
+    @GeneratedValue(generator = UlidGenerator.GENERATOR_NAME)  
+    @Column(name="id")
+    private ULID id;
+}
+```
+
 # Implementation
 
-This is a complete implementation of the [ULID specification](https://github.com/ulid/spec).
-Internally, the ID is represented as two 64-bit, `long` values to create the
+Internally, the ID is represented as two 64-bit `long` values to create the
 128-bit ULID.
 
 ## Encoding
@@ -24,11 +70,20 @@ violate the original intent of the ULID specification. The implementation also
 does not allow the hyphens or check-digits allowed in Crockford's Base32
 specification.
 
+However, it does allow lower-case alphabet letters, but lower-case
+letters will not be preserved. The following is an example of a "round-trip" of
+a string value with lower-case letters. The `toString` method will always produce
+only upper-case characters.
+
+```java
+assert ULID.of("01f99hjbj9a3s5pdm9qpam4mgm").toString().equals("01F99HJBJ9A3S5PDM9QPAM4MGM") == true; 
+```
+
 This implementation is intended solely to deliver a high-performance,
-distributed identifier creation mechanism specifically for use in RDMSs (and
-distributed systems in general) -- not an all-in-one solution for all conceivable
-use-cases and handling. Data integrity and transmission are left to clients of
-the library.
+distributed identifier creation mechanism specifically for use in SQL and NoSQL
+(and distributed systems in general) -- not an all-in-one solution for all
+conceivable use-cases and handling. Data integrity and transmission are left to
+clients of the library.
 
 ## Monotonicity
 
