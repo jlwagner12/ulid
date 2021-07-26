@@ -362,11 +362,11 @@ class ULIDSpec extends Specification {
         var ulid = new ULID(msb, lsb)
 
         and:
-        var array = ulid.array()
+        byte[] array = ulid.array()
 
         then:
         ulid == ULID.of(array)
-        Arrays.compare(ulid.array(), array) == 0
+        ulid.array() == array
 
         where:
         msb                | lsb

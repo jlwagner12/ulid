@@ -2,14 +2,14 @@ package org.jlw.ulid
 
 import spock.lang.Specification
 
-class UlidAttributeConverterSpec extends Specification {
+class UlidStringAttributeConverterSpec extends Specification {
     def "conversion"(final String value, final long msb, final long lsb) {
         when:
         var ulid = new ULID(msb, lsb)
 
         then:
-        new UlidAttributeConverter().convertToDatabaseColumn(ulid) == value.toUpperCase()
-        new UlidAttributeConverter().convertToEntityAttribute(value) == ulid
+        new UlidStringAttributeConverter().convertToDatabaseColumn(ulid) == value.toUpperCase()
+        new UlidStringAttributeConverter().convertToEntityAttribute(value) == ulid
 
         where:
         value                        | msb                | lsb
@@ -53,7 +53,7 @@ class UlidAttributeConverterSpec extends Specification {
 
     def "bad ulid"(final String value) {
         when:
-        new UlidAttributeConverter().convertToEntityAttribute(value)
+        new UlidStringAttributeConverter().convertToEntityAttribute(value)
 
         then:
         thrown(IllegalArgumentException.class)
