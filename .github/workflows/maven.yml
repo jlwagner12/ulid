@@ -60,6 +60,7 @@ jobs:
           node-version: 12
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm install -g semantic-release @semantic-release/changelog @semantic-release/commit-analyzer @semantic-release/exec @semantic-release/git @semantic-release/release-notes-generator @semantic-release/github
       - name: Release
         run: npx semantic-release
         env:
