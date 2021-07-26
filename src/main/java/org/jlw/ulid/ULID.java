@@ -24,6 +24,7 @@
  */
 package org.jlw.ulid;
 
+import java.io.Serializable;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -38,8 +39,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author jwagner
  * @implSpec This class is immutable and thread-safe.
  */
-public final class ULID implements Comparable<ULID>
+public final class ULID implements Serializable, Comparable<ULID>
 {
+	private static final long serialVersionUID = 6933142952451714782L;
+
 	private static final int ULID_LENGTH = 26;
 
 	private static final long MAX_TIME = 0xffff_ffff_ffffL;
@@ -124,9 +127,7 @@ public final class ULID implements Comparable<ULID>
 	private final long lsb;
 
 	/**
-	 * Constructs a new {@code ULID} using the specified data.  {@code mostSigBits} is used for the most significant 64
-	 * bits of the {@code ULID} and {@code leastSignificantBits} becomes the least significant 64 bits of the {@code
-	 * ULID}.
+	 * Constructs a new {@code ULID} using the specified data.  {@code mostSigBits} is used for the most significant 64 bits of the {@code ULID} and {@code leastSignificantBits} becomes the least significant 64 bits of the {@code ULID}.
 	 *
 	 * @param mostSignificantBits
 	 * 		The most significant bits of the {@code ULID}
@@ -172,11 +173,29 @@ public final class ULID implements Comparable<ULID>
 		return new ULID(getMostSignificantBits(value), getLeastSignificantBits(value));
 	}
 
+	/**
+	 * Create a {@code ULID} instance based upon an array of byte values.
+	 *
+	 * @param bytes
+	 * 		an array of byte values
+	 * @return the {@code ULID} represented by the byte array.
+	 * @throws IllegalArgumentException
+	 * 		if there are fewer than 16 elements available within the array.
+	 */
 	public static ULID of(final byte[] bytes)
 	{
 		return of(bytes, 0);
 	}
 
+	/**
+	 * Create a {@code ULID} instance based upon an array of byte values.
+	 *
+	 * @param bytes
+	 * 		an array of byte values
+	 * @return the {@code ULID} represented by the byte array.
+	 * @throws IllegalArgumentException
+	 * 		if there are fewer than 16 elements available within the array after the {@code offset}.
+	 */
 	public static ULID of(final byte[] bytes, final int offset)
 	{
 		if ((Objects.requireNonNull(bytes).length - offset) < 16)
@@ -184,31 +203,52 @@ public final class ULID implements Comparable<ULID>
 			throw new IllegalArgumentException("byte array must have at least 16 elements");
 		} // if
 
-		final long msb = ((bytes[0] & 0xffL) << 56)
-				| ((bytes[1] & 0xffL) << 48)
-				| ((bytes[2] & 0xffL) << 40)
-				| ((bytes[3] & 0xffL) << 32)
-				| ((bytes[4] & 0xffL) << 24)
-				| ((bytes[5] & 0xffL) << 16)
-				| ((bytes[6] & 0xffL) << 8)
-				| (bytes[7] & 0xffL);
-		final long lsb = ((bytes[8] & 0xffL) << 56)
-				| ((bytes[9] & 0xffL) << 48)
-				| ((bytes[10] & 0xffL) << 40)
-				| ((bytes[11] & 0xffL) << 32)
-				| ((bytes[12] & 0xffL) << 24)
-				| ((bytes[13] & 0xffL) << 16)
-				| ((bytes[14] & 0xffL) << 8)
-				| (bytes[15] & 0xffL);
+		int n = offset;
+		final long msb = ((bytes[n++] & 0xffL) << 56)
+				| ((bytes[n++] & 0xffL) << 48)
+				| ((bytes[n++] & 0xffL) << 40)
+				| ((bytes[n++] & 0xffL) << 32)
+				| ((bytes[n++] & 0xffL) << 24)
+				| ((bytes[n++] & 0xffL) << 16)
+				| ((bytes[n++] & 0xffL) << 8)
+				| (bytes[n++] & 0xffL);
+		final long lsb = ((bytes[n++] & 0xffL) << 56)
+				| ((bytes[n++] & 0xffL) << 48)
+				| ((bytes[n++] & 0xffL) << 40)
+				| ((bytes[n++] & 0xffL) << 32)
+				| ((bytes[n++] & 0xffL) << 24)
+				| ((bytes[n++] & 0xffL) << 16)
+				| ((bytes[n++] & 0xffL) << 8)
+				| (bytes[n] & 0xffL);
 
 		return new ULID(msb, lsb);
 	}
 
+	/**
+	 * Create a {@code ULID} instance based upon an array of long values.
+	 *
+	 * @param longs
+	 * 		an array of long values; must have a minimum of two elements.
+	 * @return the {@code ULID} represented by the long array.
+	 * @throws IllegalArgumentException
+	 * 		if there are fewer than two elements available within the array.
+	 */
 	public static ULID of(final long[] longs)
 	{
 		return of(longs, 0);
 	}
 
+	/**
+	 * Create a {@code ULID} instance based upon an array of long values.
+	 *
+	 * @param longs
+	 * 		an array of long values; must have a minimum of two elements.
+	 * @param offset
+	 * 		within the array where the {@code ULID} begins.
+	 * @return the {@code ULID} represented by the long array.
+	 * @throws IllegalArgumentException
+	 * 		if there are fewer than two elements available within the array after the {@code offset}.
+	 */
 	public static ULID of(final long[] longs, final int offset)
 	{
 		if ((Objects.requireNonNull(longs).length - offset) < 2)
@@ -216,7 +256,7 @@ public final class ULID implements Comparable<ULID>
 			throw new IllegalArgumentException("long array must have at least two elements");
 		} // if
 
-		return new ULID(longs[0], longs[1]);
+		return new ULID(longs[offset], longs[offset + 1]);
 	}
 
 	/**
@@ -304,8 +344,7 @@ public final class ULID implements Comparable<ULID>
 	}
 
 	/**
-	 * Retrieve the {@link #timestamp()} associated with this {@code ULID} as a {@link LocalDateTime} with a time-zone
-	 * of {@link ZoneOffset#UTC}.
+	 * Retrieve the {@link #timestamp()} associated with this {@code ULID} as a {@link LocalDateTime} with a time-zone of {@link ZoneOffset#UTC}.
 	 *
 	 * @return The timestamp of this {@code ULID} as a {@link LocalDateTime}.
 	 * @see #timestamp()
@@ -319,6 +358,11 @@ public final class ULID implements Comparable<ULID>
 		return LocalDateTime.ofEpochSecond(seconds, nanos, ZoneOffset.UTC);
 	}
 
+	/**
+	 * Retrieve a byte array of the ULID in network byte order (i.e. big endian byte order).
+	 *
+	 * @return a byte array representing the binary value of the ULID.
+	 */
 	public byte[] array()
 	{
 		final byte[] bytes = new byte[16];
@@ -344,6 +388,11 @@ public final class ULID implements Comparable<ULID>
 		return bytes;
 	}
 
+	/**
+	 * Retrieve a long array of the ULID in network byte order (i.e. big endian byte order).
+	 *
+	 * @return a long array representing the binary value of the ULID.
+	 */
 	public long[] longArray()
 	{
 		return new long[] { msb, lsb };
@@ -376,13 +425,10 @@ public final class ULID implements Comparable<ULID>
 	}
 
 	/**
-	 * Returns a {@link String} object representing this {@code ULID}. The string representation is a conversion from
-	 * the internal, binary representation to <a href="https://www.crockford.com/base32.html">Crockford's Base32
-	 * encoding</a>. This alphabet excludes the letters I, L, O, and U to avoid confusion and abuse.
+	 * Returns a {@link String} object representing this {@code ULID}. The string representation is a conversion from the internal, binary representation to <a href="https://www.crockford.com/base32.html">Crockford's Base32 encoding</a>. This alphabet excludes the letters I, L, O, and U to avoid confusion and abuse.
 	 *
 	 * <p>The maximum string
-	 * representation is {@code 7ZZZZZZZZZZZZZZZZZZZZZZZZZ} since a 26-character string can represent 130-bits, while
-	 * the {@code ULID} specification only allows 128-bits.</p>
+	 * representation is {@code 7ZZZZZZZZZZZZZZZZZZZZZZZZZ} since a 26-character string can represent 130-bits, while the {@code ULID} specification only allows 128-bits.</p>
 	 *
 	 * <blockquote><pre>
 	 * {@code
@@ -445,8 +491,7 @@ public final class ULID implements Comparable<ULID>
 	}
 
 	/**
-	 * Compares this object to the specified object.  The result is {@code true} if and only if the argument is not
-	 * {@code null}, is a {@code ULID} object, and contains the same value, bit for bit, as this {@code ULID}.
+	 * Compares this object to the specified object.  The result is {@code true} if and only if the argument is not {@code null}, is a {@code ULID} object, and contains the same value, bit for bit, as this {@code ULID}.
 	 *
 	 * @param rhs
 	 * 		The object to be compared
@@ -469,8 +514,7 @@ public final class ULID implements Comparable<ULID>
 	 *
 	 * @param rhs
 	 *        {@code ULID} to which this {@code ULID} is to be compared
-	 * @return {@code -1}, {@code 0} or {@code 1} as this {@code ULID} is less than, equal to, or greater than {@code
-	 * 		rhs}, respectively.
+	 * @return {@code -1}, {@code 0} or {@code 1} as this {@code ULID} is less than, equal to, or greater than {@code rhs}, respectively.
 	 * @throws NullPointerException
 	 * 		if the specified object is null
 	 */
