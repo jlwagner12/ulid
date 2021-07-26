@@ -41,7 +41,7 @@ of the previous ULID incremented by one.
 The implementation is thread-safe and is handled using non-blocking techniques
 for best performance.
 
-##Binary Layout and Byte Order
+## Binary Layout and Byte Order
 
 The components are encoded as 16 octets. Each component is encoded with the Most
 Significant Byte first (network byte order). The ULID implementation has methods
