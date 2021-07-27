@@ -1,9 +1,13 @@
 # Universally Unique, Lexicographically Sortable Identifier
 
-A complete implementation of the [ULID specification](https://github.com/ulid/spec)
+A complete binary implementation of the [ULID specification](https://github.com/ulid/spec)
 
 [![Project status](https://img.shields.io/github/release/jlwagner12/ulid.svg)](https://github.com/jlwagner12/ulid/releases/latest)
 [![license](https://img.shields.io/github/license/jlwagner12/ulid.svg)](https://github.com/jlwagner12/ulid/releases/latest)
+
+[![Conventional Commits](https://camo.githubusercontent.com/74420c84a8cdfb2ed88abc162cde2dd9fc6dcf14f2ee0ec0779eb2cca98836e9/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f436f6e76656e74696f6e616c253230436f6d6d6974732d312e302e302d79656c6c6f772e737667)](https://conventionalcommits.org/)
+[![Semantic Versioning](https://img.shields.io/badge/semver-2.0.0-green)](https://semver.org/)
+[![Semantic Release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 [![Sonarcloud Status](https://sonarcloud.io/api/project_badges/measure?project=jlwagner12_ulid&metric=alert_status)](https://sonarcloud.io/dashboard?id=jlwagner12_ulid)
 [![SonarCloud Coverage](https://sonarcloud.io/api/project_badges/measure?project=jlwagner12_ulid&metric=coverage)](https://sonarcloud.io/component_measures/metric/coverage/list?id=jlwagner12_ulid)
