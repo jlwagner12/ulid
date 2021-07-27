@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/jlwagner12/ulid/compare/v0.2.0...v0.3.0) (2021-07-27)
+
+
+### Features
+
+* added UUID converter implementation ([033d2ae](https://github.com/jlwagner12/ulid/commit/033d2aea203d1f5ee5d064ecdcd4e8cfbe76a804))
+
 # [0.2.0](https://github.com/jlwagner12/ulid/compare/v0.1.0...v0.2.0) (2021-07-26)
 
 
