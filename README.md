@@ -14,6 +14,18 @@ A complete binary implementation of the [ULID specification](https://github.com/
 [![SonarCloud Bugs](https://sonarcloud.io/api/project_badges/measure?project=jlwagner12_ulid&metric=bugs)](https://sonarcloud.io/component_measures/metric/reliability_rating/list?id=jlwagner12_ulid)
 [![SonarCloud Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=jlwagner12_ulid&metric=vulnerabilities)](https://sonarcloud.io/component_measures/metric/security_rating/list?id=jlwagner12_ulid)
 
+# Key Features
+
+- Full binary implementation
+- ORM support
+- Support for database column types of
+    - any string/text type
+    - byte array
+    - long array
+    - native `UUID` types
+- Monotonic generation within the same JVM
+- Thread-safe
+
 # Usage
 
 To create a new identifier, you use `ULID.nextULID()`. To convert a `String`,
