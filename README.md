@@ -27,7 +27,7 @@ platform, and the rest should be taken care of for you.
 
 The library handles storing the ULID values in a database as either a
 26-character String (e.g. `CHAR(26)`, `VARCHAR(26)`, etc.), an array of 16
-8-bit bytes, or an array of two 64-bit longs.
+8-bit bytes, an array of two 64-bit longs, or a `UUID`.
 
 For either of the ORM solutions supported, you must make certain that the
 `org.jlw.ulid` package and classes are mapped appropriately.
