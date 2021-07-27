@@ -39,7 +39,7 @@ import javax.persistence.Converter;
 public class UlidLongAttributeConverter implements AttributeConverter<ULID, long[]>
 {
 	/**
-	 * Converts a {@link ULID} to a long array array for storage in a database column. The long array must be at least
+	 * Converts a {@link ULID} to a long array for storage in a database column. The long array must be at least
 	 * two {@code long}s long and stored in network byte order.
 	 *
 	 * @param attribute
