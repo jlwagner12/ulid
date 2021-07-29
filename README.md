@@ -235,7 +235,7 @@ public class Accounts
 }
 ```
 
-Using the default mapping or specifying `STRING`, a table chould be defined as the following.
+Using the default mapping or specifying `STRING`, a table could be defined as the following.
 
 ```roomsql
 CREATE TABLE accounts
