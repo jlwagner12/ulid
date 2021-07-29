@@ -1,3 +1,17 @@
+# [0.4.0](https://github.com/jlwagner12/ulid/compare/v0.3.0...v0.4.0) (2021-07-29)
+
+
+### Bug Fixes
+
+* add property setting for oracle ([6fa0c5e](https://github.com/jlwagner12/ulid/commit/6fa0c5ea9c1ae28537e3c932dd3d42f9b7585ac3))
+* added database name for oracle-xe ([fd58900](https://github.com/jlwagner12/ulid/commit/fd589006aac1eb1a13655486d7ae8e6fb55d6fb5))
+* fixed timezone issue in tests for oracle ([04eb0c6](https://github.com/jlwagner12/ulid/commit/04eb0c6913d1b4c5e96f7650bfeb71c2519180e3))
+
+
+### Features
+
+* complete Ebean integration ([198caed](https://github.com/jlwagner12/ulid/commit/198caedee6f6da73b2b18808c401f2ac7875dd68))
+
 # [0.3.0](https://github.com/jlwagner12/ulid/compare/v0.2.0...v0.3.0) (2021-07-27)
 
 
