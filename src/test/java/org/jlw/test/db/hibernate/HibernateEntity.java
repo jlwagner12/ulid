@@ -8,15 +8,15 @@ import javax.persistence.MappedSuperclass;
 import org.hibernate.annotations.GenericGenerator;
 import org.jlw.test.db.TestEntity;
 import org.jlw.ulid.ULID;
-import org.jlw.ulid.UlidGenerator;
+import org.jlw.ulid.EbeanUlidGenerator;
 
 @MappedSuperclass
 public class HibernateEntity implements TestEntity
 {
 	@Id
-	@GenericGenerator(name = UlidGenerator.GENERATOR_NAME,
+	@GenericGenerator(name = EbeanUlidGenerator.GENERATOR_NAME,
 			strategy = "org.jlw.ulid.UlidGenerator")
-	@GeneratedValue(generator = UlidGenerator.GENERATOR_NAME)
+	@GeneratedValue(generator = EbeanUlidGenerator.GENERATOR_NAME)
 	@Column(name = "TEST_ID")
 	private ULID id;
 

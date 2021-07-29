@@ -23,10 +23,30 @@
  */
 package org.jlw.ulid;
 
-public enum EbeanUlidType
+import io.ebean.config.IdGenerator;
+
+/**
+ * @author jwagner
+ * @implSpec This class is immutable and thread-safe.
+ */
+public class EbeanUlidGenerator implements IdGenerator
 {
-	STRING,
-	BINARY,
-	UUID,
-	EMBEDDED
+	public static final String GENERATOR_NAME = "org.jlw.ulid.gen";
+
+	/**
+	 * Return the next Id value.
+	 */
+	public ULID nextValue()
+	{
+		return ULID.nextULID();
+	}
+
+	/**
+	 * The name is used to assign the {@code UlidGenerator} to a property using
+	 * <code>@GeneratedValue(name=UlidGenerator.GENERATOR_NAME)</code>
+	 */
+	public String getName()
+	{
+		return GENERATOR_NAME;
+	}
 }

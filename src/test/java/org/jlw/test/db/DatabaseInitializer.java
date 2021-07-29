@@ -3,13 +3,15 @@ package org.jlw.test.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
-import org.jlw.ulid.EbeanUlidType;
+import org.jlw.ulid.EbeanMappingType;
 import org.jlw.ulid.UlidEbeanConfiguration;
 import org.testcontainers.shaded.org.apache.commons.lang.StringUtils;
 
+import io.avaje.config.Config;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.annotation.Platform;
@@ -21,14 +23,14 @@ public class DatabaseInitializer
 {
 	private final DatabaseDialect dialect;
 
-	private final EbeanUlidType type;
+	private final EbeanMappingType type;
 
 	public DatabaseInitializer(final DatabaseDialect dialect)
 	{
-		this(dialect, EbeanUlidType.STRING);
+		this(dialect, EbeanMappingType.STRING);
 	}
 
-	public DatabaseInitializer(final DatabaseDialect dialect, final EbeanUlidType type)
+	public DatabaseInitializer(final DatabaseDialect dialect, final EbeanMappingType type)
 	{
 		this.dialect = Objects.requireNonNull(dialect);
 		this.type = Objects.requireNonNull(type);
@@ -51,22 +53,20 @@ public class DatabaseInitializer
 	{
 		final DatabaseConfig databaseConfig = new DatabaseConfig();
 
-		if (StringUtils.containsIgnoreCase(init.getDriver(), "sqlserver"))
-		{
-			databaseConfig.setDatabasePlatformName(Platform.SQLSERVER17.name().toLowerCase());
-			databaseConfig.setIdType(IdType.IDENTITY);
-		} // if
+		Optional.ofNullable(init.getDriver())
+				.filter(v -> StringUtils.containsIgnoreCase(v, "sqlserver"))
+				.ifPresent(v -> databaseConfig.setDatabasePlatformName(Platform.SQLSERVER17.name().toLowerCase()));
 
+		Optional.ofNullable(init.getDatabaseName())
+				.filter(StringUtils::isNotBlank)
+				.ifPresent(databaseConfig::setName);
+
+		Optional.ofNullable(init.getSchemaName())
+				.filter(StringUtils::isNotBlank)
+				.ifPresent(databaseConfig::setDbSchema);
+
+		Config.setProperty(UlidEbeanConfiguration.PROPERTY_NAME, type.name());
 		databaseConfig.setDataSourceConfig(dataSourceConfig);
-		databaseConfig.setDataTimeZone("UTC");
-		databaseConfig.setName(init.getDatabaseName());
-
-		if (StringUtils.isNotBlank(init.getSchemaName()))
-		{
-			databaseConfig.setDbSchema(init.getSchemaName());
-		} // if
-
-		databaseConfig.setPersistBatchSize(100);
 		databaseConfig.setDefaultServer(false);
 		databaseConfig.loadFromProperties();
 
@@ -90,7 +90,6 @@ public class DatabaseInitializer
 		final DatabaseDialectImpl impl = dialect.getImplementation();
 
 		impl.createInstance();
-		UlidEbeanConfiguration.setDatabaseType(type);
 	}
 
 	private void createSchema(final DataSource ds) throws SQLException

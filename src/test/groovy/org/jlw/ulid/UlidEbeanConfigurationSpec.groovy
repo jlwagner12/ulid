@@ -7,13 +7,10 @@ import spock.lang.Specification
 class UlidEbeanConfigurationSpec extends Specification {
     def "binary config"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType(EbeanUlidType.BINARY)
-
-        and:
         var config = new DatabaseConfig()
 
         and:
-        new UlidEbeanConfiguration().postConfigure(config)
+        new UlidEbeanConfiguration(EbeanMappingType.BINARY).postConfigure(config)
 
         expect:
         config.getPackages().isEmpty()
@@ -27,18 +24,15 @@ class UlidEbeanConfigurationSpec extends Specification {
                         .contains(v))
         config.getIdGenerators()
                 .stream()
-                .anyMatch(v -> v instanceof UlidGenerator)
+                .anyMatch(v -> v instanceof EbeanUlidGenerator)
     }
 
     def "string config"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType(EbeanUlidType.STRING)
-
-        and:
         var config = new DatabaseConfig()
 
         and:
-        new UlidEbeanConfiguration().postConfigure(config)
+        new UlidEbeanConfiguration(EbeanMappingType.STRING).postConfigure(config)
 
         expect:
         config.getPackages().isEmpty()
@@ -52,18 +46,15 @@ class UlidEbeanConfigurationSpec extends Specification {
                         .contains(v))
         config.getIdGenerators()
                 .stream()
-                .anyMatch(v -> v instanceof UlidGenerator)
+                .anyMatch(v -> v instanceof EbeanUlidGenerator)
     }
 
     def "UUID config"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType(EbeanUlidType.UUID)
-
-        and:
         var config = new DatabaseConfig()
 
         and:
-        new UlidEbeanConfiguration().postConfigure(config)
+        new UlidEbeanConfiguration(EbeanMappingType.UUID).postConfigure(config)
 
         expect:
         config.getPackages().isEmpty()
@@ -77,18 +68,15 @@ class UlidEbeanConfigurationSpec extends Specification {
                         .contains(v))
         config.getIdGenerators()
                 .stream()
-                .anyMatch(v -> v instanceof UlidGenerator)
+                .anyMatch(v -> v instanceof EbeanUlidGenerator)
     }
 
     def "embedded config"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType(EbeanUlidType.EMBEDDED)
-
-        and:
         var config = new DatabaseConfig()
 
         and:
-        new UlidEbeanConfiguration().postConfigure(config)
+        new UlidEbeanConfiguration(EbeanMappingType.EMBEDDED).postConfigure(config)
 
         expect:
         config.getPackages().isEmpty()
@@ -101,6 +89,6 @@ class UlidEbeanConfigurationSpec extends Specification {
                         .contains(v))
         config.getIdGenerators()
                 .stream()
-                .anyMatch(v -> v instanceof UlidGenerator)
+                .anyMatch(v -> v instanceof EbeanUlidGenerator)
     }
 }

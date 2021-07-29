@@ -45,14 +45,19 @@ public class UlidEbeanConfiguration implements AutoConfigure
 
 	private static final Logger logger = LoggerFactory.getLogger(UlidEbeanConfiguration.class);
 
-	private static String databaseType;
+	private String databaseType;
 
-	public static void setDatabaseType(final EbeanUlidType value)
+	public UlidEbeanConfiguration()
 	{
-		setDatabaseType(value.name());
+		this(EbeanMappingType.STRING);
 	}
 
-	public static void setDatabaseType(final String value)
+	public UlidEbeanConfiguration(final EbeanMappingType value)
+	{
+		this(value.name());
+	}
+
+	public UlidEbeanConfiguration(final String value)
 	{
 		databaseType = value;
 	}
@@ -65,14 +70,19 @@ public class UlidEbeanConfiguration implements AutoConfigure
 		// 		settings from the properties
 	}
 
+	public void configure(final DatabaseConfig config)
+	{
+		postConfigure(config);
+	}
+
 	@Override
 	public void postConfigure(final DatabaseConfig config)
 	{
 		cleanClasses(config, getBootupClasses(config));
-		config.add(new UlidGenerator());
+		config.add(new EbeanUlidGenerator());
 		config.addClass(ULID.class);
 
-		final EbeanUlidType type = getDatabaseType(config);
+		final EbeanMappingType type = getDatabaseType(config);
 
 		switch (type)
 		{
@@ -96,18 +106,18 @@ public class UlidEbeanConfiguration implements AutoConfigure
 		logger.debug("default ULID database type set to {}", type);
 	}
 
-	EbeanUlidType getDatabaseType(final DatabaseConfig config)
+	EbeanMappingType getDatabaseType(final DatabaseConfig config)
 	{
 		return Optional.ofNullable(config.getProperties())
 				.map(p -> p.getProperty(PROPERTY_NAME))
 				.filter(v -> v.length() > 0)
 				.filter(Predicate.not(v -> v.matches("^\\s+$")))
-				.map(EbeanUlidType::valueOf)
+				.map(EbeanMappingType::valueOf)
 				.orElseGet(() -> Optional.ofNullable(databaseType)
 						.filter(v -> v.length() > 0)
 						.filter(Predicate.not(v -> v.matches("^\\s+$")))
-						.map(EbeanUlidType::valueOf)
-						.orElse(EbeanUlidType.STRING));
+						.map(EbeanMappingType::valueOf)
+						.orElse(EbeanMappingType.STRING));
 	}
 
 	private void cleanClasses(final DatabaseConfig config, final BootupClasses classes)
@@ -115,7 +125,7 @@ public class UlidEbeanConfiguration implements AutoConfigure
 		final Set<Class<?>> library = Stream.of(ULID.class,
 				UlidBinaryAttributeConverter.class,
 				UlidEbeanConfiguration.class,
-				UlidGenerator.class,
+				EbeanUlidGenerator.class,
 				UlidStringAttributeConverter.class,
 				UlidUuidAttributeConverter.class)
 				.collect(Collectors.toSet());

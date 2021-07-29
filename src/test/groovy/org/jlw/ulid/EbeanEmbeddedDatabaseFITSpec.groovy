@@ -3,9 +3,7 @@ package org.jlw.ulid
 import io.ebean.Database
 import org.jlw.test.db.DatabaseDialect
 import org.jlw.test.db.DatabaseInitializer
-import org.jlw.test.db.ebean.EBeanEntity
 import org.jlw.test.db.ebean.EmbeddedIdEbeanEntity
-import org.jlw.test.db.ebean.UuidIdEbeanEntity
 import spock.lang.Specification
 
 class EbeanEmbeddedDatabaseFITSpec extends Specification {
@@ -26,7 +24,7 @@ class EbeanEmbeddedDatabaseFITSpec extends Specification {
         }
 
         given:
-        var dbInit = new DatabaseInitializer(dbDialect, EbeanUlidType.EMBEDDED)
+        var dbInit = new DatabaseInitializer(dbDialect, EbeanMappingType.EMBEDDED)
 
         and:
         db = dbInit.getEbeanDatabase()

@@ -108,4 +108,19 @@ class ConfigurationScanSpec extends Specification {
         1 * scanner.searchClasses(_)
         0 * scanner.staticClasses(_)
     }
+
+    def "no preConfigure"() {
+        setup:
+        UlidEbeanConfiguration scanner = Spy(UlidEbeanConfiguration)
+
+        when:
+        var dbconfig = new DatabaseConfig()
+
+        and:
+        scanner.preConfigure(dbconfig)
+
+        then:
+        0 * scanner.searchClasses(_)
+        0 * scanner.staticClasses(_)
+    }
 }

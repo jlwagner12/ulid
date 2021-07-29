@@ -7,13 +7,13 @@ import javax.persistence.MappedSuperclass;
 
 import org.jlw.test.db.TestEntity;
 import org.jlw.ulid.ULID;
-import org.jlw.ulid.UlidGenerator;
+import org.jlw.ulid.EbeanUlidGenerator;
 
 @MappedSuperclass
 public abstract class EBeanEntity implements TestEntity
 {
 	@Id
-	@GeneratedValue(generator = UlidGenerator.GENERATOR_NAME)
+	@GeneratedValue(generator = EbeanUlidGenerator.GENERATOR_NAME)
 	@Column(name = "TEST_ID")
 	private ULID id;
 

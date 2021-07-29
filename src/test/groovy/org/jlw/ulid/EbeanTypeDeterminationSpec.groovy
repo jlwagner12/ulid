@@ -6,10 +6,6 @@ import spock.lang.Specification
 
 
 class EbeanTypeDeterminationSpec extends Specification {
-    def setup() {
-        UlidEbeanConfiguration.setDatabaseType(null)
-    }
-
     def "default"() {
         given:
         var config = new UlidEbeanConfiguration()
@@ -18,7 +14,7 @@ class EbeanTypeDeterminationSpec extends Specification {
         var dbconfig = new DatabaseConfig()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.STRING
+        config.getDatabaseType(dbconfig) == EbeanMappingType.STRING
     }
 
     def "binary property"() {
@@ -35,21 +31,18 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.BINARY
+        config.getDatabaseType(dbconfig) == EbeanMappingType.BINARY
     }
 
     def "binary setting"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType(EbeanUlidType.BINARY)
-
-        and:
-        var config = new UlidEbeanConfiguration()
+        var config = new UlidEbeanConfiguration(EbeanMappingType.BINARY)
 
         and:
         var dbconfig = new DatabaseConfig()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.BINARY
+        config.getDatabaseType(dbconfig) == EbeanMappingType.BINARY
     }
 
     def "uuid property"() {
@@ -66,15 +59,12 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.UUID
+        config.getDatabaseType(dbconfig) == EbeanMappingType.UUID
     }
 
     def "uuid setting"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType(EbeanUlidType.UUID)
-
-        and:
-        var config = new UlidEbeanConfiguration()
+        var config = new UlidEbeanConfiguration(EbeanMappingType.UUID)
 
         and:
         var dbconfig = new DatabaseConfig()
@@ -83,7 +73,7 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.UUID
+        config.getDatabaseType(dbconfig) == EbeanMappingType.UUID
     }
 
     def "embedded property"() {
@@ -100,15 +90,12 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.EMBEDDED
+        config.getDatabaseType(dbconfig) == EbeanMappingType.EMBEDDED
     }
 
     def "embedded setting"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType(EbeanUlidType.EMBEDDED)
-
-        and:
-        var config = new UlidEbeanConfiguration()
+        var config = new UlidEbeanConfiguration(EbeanMappingType.EMBEDDED)
 
         and:
         var dbconfig = new DatabaseConfig()
@@ -117,7 +104,7 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.EMBEDDED
+        config.getDatabaseType(dbconfig) == EbeanMappingType.EMBEDDED
     }
 
     def "empty property"() {
@@ -134,15 +121,12 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.STRING
+        config.getDatabaseType(dbconfig) == EbeanMappingType.STRING
     }
 
     def "empty setting"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType("")
-
-        and:
-        var config = new UlidEbeanConfiguration()
+        var config = new UlidEbeanConfiguration("")
 
         and:
         var dbconfig = new DatabaseConfig()
@@ -151,7 +135,7 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.STRING
+        config.getDatabaseType(dbconfig) == EbeanMappingType.STRING
     }
 
     def "blank property"() {
@@ -168,15 +152,12 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.STRING
+        config.getDatabaseType(dbconfig) == EbeanMappingType.STRING
     }
 
     def "blank setting"() {
         given:
-        UlidEbeanConfiguration.setDatabaseType("   \t\n\n")
-
-        and:
-        var config = new UlidEbeanConfiguration()
+        var config = new UlidEbeanConfiguration("   \t\n\n")
 
         and:
         var dbconfig = new DatabaseConfig()
@@ -185,7 +166,7 @@ class EbeanTypeDeterminationSpec extends Specification {
         dbconfig.loadFromProperties()
 
         expect:
-        config.getDatabaseType(dbconfig) == EbeanUlidType.STRING
+        config.getDatabaseType(dbconfig) == EbeanMappingType.STRING
     }
 
     def "no type property"() {
@@ -204,13 +185,16 @@ class EbeanTypeDeterminationSpec extends Specification {
 
     def "no type setting"() {
         when:
-        UlidEbeanConfiguration.setDatabaseType("NONE")
+        var config = new UlidEbeanConfiguration("NONE")
 
         and:
         var dbconfig = new DatabaseConfig()
 
         and:
         dbconfig.loadFromProperties()
+
+        and:
+        config.getDatabaseType(dbconfig)
 
         then:
         thrown(IllegalArgumentException.class)

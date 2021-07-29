@@ -23,49 +23,10 @@
  */
 package org.jlw.ulid;
 
-import java.io.Serializable;
-
-import org.hibernate.HibernateException;
-import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.id.IdentifierGenerator;
-
-import io.ebean.config.IdGenerator;
-
-/**
- * @author jwagner
- * @implSpec This class is immutable and thread-safe.
- */
-public class UlidGenerator implements IdGenerator, IdentifierGenerator
+public enum EbeanMappingType
 {
-	public static final String GENERATOR_NAME = "org.jlw.ulid.gen";
-
-	/**
-	 * Return the next Id value.
-	 */
-	public ULID nextValue()
-	{
-		return ULID.nextULID();
-	}
-
-	/**
-	 * The name is used to assign the {@code UlidGenerator} to a property using
-	 * <code>@GeneratedValue(name=UlidGenerator.GENERATOR_NAME)</code>
-	 */
-	public String getName()
-	{
-		return GENERATOR_NAME;
-	}
-
-	@Override
-	public Serializable generate(final SharedSessionContractImplementor sharedSessionContractImplementor, final Object o)
-			throws HibernateException
-	{
-		return ULID.nextULID();
-	}
-
-	@Override
-	public boolean supportsJdbcBatchInserts()
-	{
-		return true;
-	}
+	STRING,
+	BINARY,
+	UUID,
+	EMBEDDED
 }

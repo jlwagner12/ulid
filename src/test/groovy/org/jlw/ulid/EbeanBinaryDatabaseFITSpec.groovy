@@ -5,7 +5,6 @@ import org.jlw.test.db.DatabaseDialect
 import org.jlw.test.db.DatabaseInitializer
 import org.jlw.test.db.ebean.BinaryIdEbeanEntity
 import org.jlw.test.db.ebean.EBeanEntity
-import org.jlw.test.db.ebean.StringIdEbeanEntity
 import spock.lang.Specification
 
 class EbeanBinaryDatabaseFITSpec extends Specification {
@@ -22,7 +21,7 @@ class EbeanBinaryDatabaseFITSpec extends Specification {
         this.dbDialect = dialect as DatabaseDialect
 
         given:
-        var dbInit = new DatabaseInitializer(dbDialect, EbeanUlidType.BINARY)
+        var dbInit = new DatabaseInitializer(dbDialect, EbeanMappingType.BINARY)
 
         and:
         db = dbInit.getEbeanDatabase()
