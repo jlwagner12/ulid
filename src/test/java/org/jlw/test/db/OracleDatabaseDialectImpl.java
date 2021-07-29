@@ -14,6 +14,7 @@ public class OracleDatabaseDialectImpl extends ContainerDatabaseDialectImpl
 	@Override
 	public void createInstance()
 	{
+		// add this property as a fix for ORA-01882 and ORA-00604
 		System.setProperty("oracle.jdbc.timezoneAsRegion", "false");
 		container = new OracleContainer(imageName);
 		container.start();
