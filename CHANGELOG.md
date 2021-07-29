@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/jlwagner12/ulid/compare/v0.4.0...v0.4.1) (2021-07-29)
+
+
+### Bug Fixes
+
+* updated tests ([a532114](https://github.com/jlwagner12/ulid/commit/a532114b8c81eb7c9aade757c8642fb9cf243d9c))
+
 # [0.4.0](https://github.com/jlwagner12/ulid/compare/v0.3.0...v0.4.0) (2021-07-29)
 
 
