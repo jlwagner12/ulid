@@ -14,6 +14,7 @@ public class OracleDatabaseDialectImpl extends ContainerDatabaseDialectImpl
 	@Override
 	public void createInstance()
 	{
+		System.setProperty("oracle.jdbc.timezoneAsRegion", "false");
 		container = new OracleContainer(imageName);
 		container.start();
 	}
