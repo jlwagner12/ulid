@@ -16,7 +16,7 @@ class ConfigurationScanSpec extends Specification {
         dbconfig.setDisableClasspathSearch(false)
 
         and:
-        scanner.postConfigure(dbconfig)
+        scanner.configure(dbconfig)
 
         then:
         dbconfig.getPackages().isEmpty()
@@ -36,7 +36,7 @@ class ConfigurationScanSpec extends Specification {
         dbconfig.setDisableClasspathSearch(true)
 
         and:
-        scanner.postConfigure(dbconfig)
+        scanner.configure(dbconfig)
 
         then:
         dbconfig.getPackages().isEmpty()
@@ -56,7 +56,7 @@ class ConfigurationScanSpec extends Specification {
         dbconfig.setDisableClasspathSearch(false)
 
         and:
-        scanner.postConfigure(dbconfig)
+        scanner.configure(dbconfig)
 
         then:
         dbconfig.getPackages().isEmpty()
@@ -78,7 +78,7 @@ class ConfigurationScanSpec extends Specification {
         dbconfig.setDisableClasspathSearch(false)
 
         and:
-        scanner.postConfigure(dbconfig)
+        scanner.configure(dbconfig)
 
         then:
         dbconfig.getPackages().isEmpty()
@@ -100,7 +100,7 @@ class ConfigurationScanSpec extends Specification {
         dbconfig.setDisableClasspathSearch(false)
 
         and:
-        scanner.postConfigure(dbconfig)
+        scanner.configure(dbconfig)
 
         then:
         dbconfig.getPackages().isEmpty()
