@@ -66,6 +66,7 @@ public class DatabaseInitializer
 				.ifPresent(databaseConfig::setDbSchema);
 
 		Config.setProperty(UlidEbeanConfiguration.PROPERTY_NAME, type.name());
+		databaseConfig.setDataTimeZone("UTC");
 		databaseConfig.setDataSourceConfig(dataSourceConfig);
 		databaseConfig.setDefaultServer(false);
 		databaseConfig.loadFromProperties();
