@@ -35,8 +35,6 @@ A complete binary implementation of the [ULID specification](https://github.com/
 
 # Contents
 
----
-
 - [Key Features](#key-features)
 - [Usage](#usage)
   - [ORM Integration](#orm-integration)
