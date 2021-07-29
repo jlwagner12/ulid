@@ -49,7 +49,8 @@ A complete binary implementation of the [ULID specification](https://github.com/
 # Usage
 
 To create a new identifier, you use `ULID.nextULID()`. To convert a `String`,
-`byte[]`, or `long[]`, you use `ULID.of(value)`.
+`byte[]`, or `long[]`, you use `ULID.of(value)`. To get a string verion of the
+ULID, just call `toString()`.
 
 ## ORM Integration
 
