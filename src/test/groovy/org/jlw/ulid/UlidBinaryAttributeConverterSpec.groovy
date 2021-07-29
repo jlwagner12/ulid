@@ -2,14 +2,14 @@ package org.jlw.ulid
 
 import spock.lang.Specification
 
-class UlidByteAttributeConverterSpec extends Specification {
+class UlidBinaryAttributeConverterSpec extends Specification {
     def "conversion"(final long msb, final long lsb, final byte[] array) {
         when:
         var ulid = new ULID(msb, lsb)
 
         then:
-        new UlidByteAttributeConverter().convertToDatabaseColumn(ulid) == array
-        new UlidByteAttributeConverter().convertToEntityAttribute(array) == ulid
+        new UlidBinaryAttributeConverter().convertToDatabaseColumn(ulid) == array
+        new UlidBinaryAttributeConverter().convertToEntityAttribute(array) == ulid
 
         where:
         msb                | lsb                  | array
@@ -53,7 +53,7 @@ class UlidByteAttributeConverterSpec extends Specification {
 
     def "bad ulid"(final byte[] value) {
         when:
-        new UlidByteAttributeConverter().convertToEntityAttribute(value)
+        new UlidBinaryAttributeConverter().convertToEntityAttribute(value)
 
         then:
         thrown(IllegalArgumentException.class)

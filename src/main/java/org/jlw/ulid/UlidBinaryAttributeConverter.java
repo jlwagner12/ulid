@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- *
  */
 package org.jlw.ulid;
 
@@ -37,7 +36,7 @@ import javax.persistence.Converter;
  * @implSpec This class is immutable and thread-safe.
  */
 @Converter
-public class UlidByteAttributeConverter implements AttributeConverter<ULID, byte[]>
+public class UlidBinaryAttributeConverter implements AttributeConverter<ULID, byte[]>
 {
 	/**
 	 * Converts a {@link ULID} to a 16-byte array for storage in a database column. The byte array must be at least 16

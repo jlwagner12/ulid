@@ -21,7 +21,6 @@ A complete binary implementation of the [ULID specification](https://github.com/
 - Support for database column types of
     - any string/text type
     - byte array
-    - long array
     - native `UUID` types
 - Monotonic generation within the same JVM
 - Thread-safe
@@ -39,7 +38,7 @@ platform, and the rest should be taken care of for you.
 
 The library handles storing the ULID values in a database as either a
 26-character String (e.g. `CHAR(26)`, `VARCHAR(26)`, etc.), an array of 16
-8-bit bytes, an array of two 64-bit longs, or a `UUID`.
+8-bit bytes, or a `UUID`.
 
 For either of the ORM solutions supported, you must make certain that the
 `org.jlw.ulid` package and classes are mapped appropriately.
@@ -51,7 +50,9 @@ For either of the ORM solutions supported, you must make certain that the
 public class Client
 {
     @Id
-    @GenericGenerator(name = UlidGenerator.GENERATOR_NAME, strategy = "org.jlw.ulid.UlidGenerator")
+    @GenericGenerator(
+    		name = UlidGenerator.GENERATOR_NAME,
+            strategy = "org.jlw.ulid.UlidGenerator")
     @GeneratedValue(generator = UlidGenerator.GENERATOR_NAME)  
     @Column(name="id")
     private ULID id;
@@ -66,7 +67,7 @@ public class Client
 {
     @Id
     @GeneratedValue(generator = UlidGenerator.GENERATOR_NAME)  
-    @Column(name="id")
+    @Column(name = "id")
     private ULID id;
 }
 ```

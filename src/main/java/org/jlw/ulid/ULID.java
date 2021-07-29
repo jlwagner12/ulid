@@ -33,12 +33,15 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.persistence.Embeddable;
+
 /**
  * An implementation of the <a href="https://github.com/ulid/spec">ULID</a> specification.
  *
  * @author jwagner
  * @implSpec This class is immutable and thread-safe.
  */
+@Embeddable
 public final class ULID implements Serializable, Comparable<ULID>
 {
 	private static final long serialVersionUID = 6933142952451714782L;
@@ -192,6 +195,8 @@ public final class ULID implements Serializable, Comparable<ULID>
 	 *
 	 * @param bytes
 	 * 		an array of byte values
+	 * @param offset
+	 * 		the array offset from which to start reading the {@code ULID} data.
 	 * @return the {@code ULID} represented by the byte array.
 	 * @throws IllegalArgumentException
 	 * 		if there are fewer than 16 elements available within the array after the {@code offset}.
