@@ -18,12 +18,35 @@ A complete binary implementation of the [ULID specification](https://github.com/
 
 - Full binary implementation
 - ORM support
+- Fully tested against
+  - H2
+  - Microsoft SQL Server
+  - MySql
+  - Oracle
+  - PostgreSQL
+  - Sqlite
 - Support for database column types of
-    - any string/text type
-    - byte array
-    - native `UUID` types
+  - any string/text type
+  - binary
+  - native `UUID` types
+  - embedded type using two 64-bit capable SQL columns
 - Monotonic generation within the same JVM
 - Thread-safe
+
+# Contents
+
+---
+
+- [Key Features](#key-features)
+- [Usage](#usage)
+  - [ORM Integration](#orm-integration)
+    - [Hibernate/Spring](#hibernatespring)
+    - [Ebean ORM](#ebean-orm)
+  - [ULID to SQL DDL Mapping](#ulid-to-sql-ddl-mapping)
+- [Implementation](#implementation)
+  - [Encoding](#encoding)
+  - [Monotonicity](#monotonicity)
+  - [Binary Layout and Byte Order](#binary-layout-and-byte-order)
 
 # Usage
 
@@ -34,43 +57,199 @@ To create a new identifier, you use `ULID.nextULID()`. To convert a `String`,
 
 The ULID implementation can be integrated for use with either Hibernate or 
 Ebeans with minimal configuration. Just use the appropriate annotations for your
-platform, and the rest should be taken care of for you.
+platform and a few minor settings, and the rest should be taken care of for you.
 
 The library handles storing the ULID values in a database as either a
 26-character String (e.g. `CHAR(26)`, `VARCHAR(26)`, etc.), an array of 16
-8-bit bytes, or a `UUID`.
+8-bit bytes, a `UUID`, or as an embedded identifier with two `long` values.
 
-For either of the ORM solutions supported, you must make certain that the
-`org.jlw.ulid` package and classes are mapped appropriately.
+For comprehensive examples, look to the test packages -- specifically,
+/src/test/java/org/jlw/test/db/(ebean|hibernate).
 
 ### Hibernate/Spring
 
-```java
-@Entity
-public class Client
-{
-    @Id
-    @GenericGenerator(
-    		name = UlidGenerator.GENERATOR_NAME,
-            strategy = "org.jlw.ulid.UlidGenerator")
-    @GeneratedValue(generator = UlidGenerator.GENERATOR_NAME)  
-    @Column(name="id")
-    private ULID id;
-}
-```
+Coming soon...
 
 ### Ebean ORM
 
+Ebean is not a comprehensive JPA implementation. Instead, it attempts to provide
+a compromise between full JPA and ease of use. Regardless whether you feel it's
+successful in it's attempts, it's a great, straight-forward platform to use.
+
+It does have its idiosyncrasies, though. One of the major is the limit of regarding
+column type conversions. When mapping custom Java types, such as ULID, to
+databasse types, Ebeans limits clients to a
+[single, database-wide mapping](https://github.com/ebean-orm/ebean/issues/1777).
+
+This implementation allows you to set the mapping for your database when
+[configuring the Database](https://ebean.io/docs/intro/configuration/). If you
+choose to configure your database via properties files, you can set the
+property `ebean.ulid.type` to one of `"BINARY"`, `"UUID"`, `"STRING"`, or
+`"EMBEDDED"` with `"STRING"` being the default if none are specified.
+This is accomplished via Ebean's
+[AutoConfigure](https://ebean.io/apidoc/12/io/ebean/config/AutoConfigure.html)
+SPI.
+
+```java
+DatabaseConfig databaseConfig = new DatabaseConfig();
+
+// ...
+
+databaseConfig.loadFromProperties();
+
+Database db = DatabaseFactory.create(databaseConfig);
+```
+
+Configuring the mapping programmatically, you just construct a
+`UlidEbeanConfiguration` instance and call `configure` passing in the `DatabaseConfig`
+with either the `EbeanMappingType` enumeration value or the `String` equivalent. The
+default constructor will create a `STRING` mapping.
+
+```java
+UlidEbeanConfiguration ulidConfig = new UlidEbeanConfiguration(); // default STRING mapping
+// or
+UlidEbeanConfiguration ulidConfig = new UlidEbeanConfiguration(EbeanMappingType.BINARY);
+// or
+UlidEbeanConfiguration ulidConfig = new UlidEbeanConfiguration("BINARY");
+
+DatabaseConfig config = new DatabaseConfig();
+// ...
+ulidConfig.configure(config);
+```
+
+Using a ULID within an entity is straight-forward. You only need specify the
+Ebean `IdGenerator` for all except the `EbeanMappingType.EMBEDDED` mapping.
+
 ```java
 @Entity
 public class Client
 {
     @Id
-    @GeneratedValue(generator = UlidGenerator.GENERATOR_NAME)  
+    @GeneratedValue(generator = EbeanUlidGenerator.GENERATOR_NAME)  
     @Column(name = "id")
     private ULID id;
+
+    // ...
 }
 ```
+
+For the `EbeanMappingType.EMBEDDED` mapping, a bit more work is involved.
+
+```java
+@Entity
+public class Client
+{
+    @EmbeddedId
+    @AttributeOverrides({
+            @AttributeOverride(name = "msb", column = @Column(name = "MSB_COLUMN_NAME")),
+            @AttributeOverride(name = "lsb", column = @Column(name = "LSB_COLUMN_NAME"))
+    })
+    private ULID id;
+
+    // ...
+}
+```
+
+## ULID to SQL DDL Mapping
+
+| Database                 | ULID Mapping Type    | SQL Column Type                |
+| ------------------------ | -------------------- | ------------------------------ |
+|                          |                      |                                |
+| **H2**                   | BINARY               | BINARY(16)                     |
+|                          | EMBEDDED<sup>†</sup> | MSB BIGINT, LSB BIGINT         |
+|                          | STRING               | CHAR(26)                       |
+|                          | UUID                 | UUID                           |
+|                          |                      |                                |
+| **Microsoft SQL Server** | BINARY               | BINARY(16)                     |
+|                          | EMBEDDED<sup>†</sup> | MSB BIGINT, LSB BIGINT         |
+|                          | STRING               | CHAR(26)                       |
+|                          | UUID                 | UNIQUEIDENTIFIER               |
+|                          |                      |                                |
+| **MySql**                | BINARY               | BINARY(16)                     |
+|                          | EMBEDDED<sup>†</sup> | MSB BIGINT, LSB BIGINT         |
+|                          | STRING               | CHAR(26)                       |
+|                          | UUID<sup>‡</sup>     |                                |
+|                          |                      |                                |
+| **Oracle**               | BINARY               | RAW(16)                        |
+|                          | EMBEDDED<sup>†</sup> | MSB NUMBER(20), LSB NUMBER(20) |
+|                          | STRING               | CHAR(26)                       |
+|                          | UUID<sup>‡</sup>     |                                |
+|                          |                      |                                |
+| **PostgreSQL**           | BINARY               | bytea                          |
+|                          | EMBEDDED<sup>†</sup> | MSB bigint, LSB bigint         |
+|                          | STRING               | char(26)                       |
+|                          | UUID                 | uuid                           |
+|                          |                      |                                |
+| **Sqlite**               | BINARY               | BLOB                           |
+|                          | EMBEDDED<sup>†</sup> | MSB BIGINT, LSB BIGINT         |
+|                          | STRING               | CHAR(26)                       |
+|                          | UUID                 | BLOB                           |
+
+<sup>†</sup> This mapping type requires two columns. You'll need to make certain
+to use the `@AttributeOverrides` and `@AttributeOverride` JPA annotations where
+the name argument to the `@AttributeOverride` annotation is `msb` for the most
+significant bits and `lsb` for the least significant bits. To maintain proper
+sort order, the `msb` column should be defined before the `lsb` column in your
+DDL.
+
+<sup>‡</sup> The specified RDBMS does not have native support for the UUID type.
+
+### DDL Examples
+
+Using Microsoft SQL Server as your database, you might define a table such as the
+following when mapping a ULID to `EBeanMappingType.BINARY`.
+
+```roomsql
+CREATE TABLE accounts
+(
+    account_id BINARY(16) PRIMARY KEY,
+    -- ...
+);
+```
+
+Likewise for Postgres, you might define a table such as the following when
+mapping a ULID to `EBeanMappingType.EMBEDDED`.
+
+```roomsql
+CREATE TABLE accounts
+(
+    account_msb_id bigint NOT NULL,
+    account_lsb_id bigint NOT NULL,
+    -- ...
+    CONSTRAINT accounts_pk PRIMARY KEY (account_msb_id, account_lsb_id)
+);
+```
+
+With the corresponding Java class defined as the following.
+
+```java
+@Entity
+public class Accounts
+{
+    @EmbeddedId
+    @AttributeOverrides({
+            @AttributeOverride(name = "msb", column = @Column(name = "account_msb_id")),
+            @AttributeOverride(name = "lsb", column = @Column(name = "account_lsb_id"))
+    })
+    private ULID id;
+
+    // ...
+}
+```
+
+Using the default mapping or specifying `STRING`, a table chould be defined as the following.
+
+```roomsql
+CREATE TABLE accounts
+(
+    account_id CHAR(26) PRIMARY KEY,
+    -- ...
+);
+```
+
+The `STRING` mapping type can handle any text-based column type (e.g. `CHAR`,
+`VARCHAR`, `TEXT`, etc.). However, for performance and storage considerations,
+it's best to use the `CHAR` type with a length of 26 characters.
 
 # Implementation
 
