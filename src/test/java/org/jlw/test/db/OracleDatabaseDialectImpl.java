@@ -33,6 +33,6 @@ public class OracleDatabaseDialectImpl extends ContainerDatabaseDialectImpl
 	@Override
 	public String getDatabaseName()
 	{
-		return "";
+		return "XE";
 	}
 }
