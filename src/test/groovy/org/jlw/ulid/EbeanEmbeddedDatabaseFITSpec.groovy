@@ -19,10 +19,6 @@ class EbeanEmbeddedDatabaseFITSpec extends Specification {
     def "database string #dialect"() {
         this.dbDialect = dialect as DatabaseDialect
 
-        if (!dbDialect.getInitializer().hasUuid()) {
-            return
-        }
-
         given:
         var dbInit = new DatabaseInitializer(dbDialect, EbeanMappingType.EMBEDDED)
 
