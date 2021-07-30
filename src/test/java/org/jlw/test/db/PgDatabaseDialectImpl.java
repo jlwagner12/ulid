@@ -6,7 +6,8 @@ import org.testcontainers.utility.DockerImageName;
 
 public class PgDatabaseDialectImpl extends ContainerDatabaseDialectImpl
 {
-	private final DockerImageName imageName = DockerImageName.parse("postgres:12");
+	private final DockerImageName imageName = DockerImageName.parse("postgres")
+			.withTag("12");
 
 	private PostgreSQLContainer<?> container;
 

@@ -7,7 +7,8 @@ import org.testcontainers.utility.DockerImageName;
 
 public class MySqlDatabaseDialectImpl extends ContainerDatabaseDialectImpl
 {
-	private final DockerImageName imageName = DockerImageName.parse("mysql:8.0.26");
+	private final DockerImageName imageName = DockerImageName.parse("mysql")
+			.withTag("8.0.26");
 
 	private MySQLContainer<?> container;
 

@@ -6,7 +6,8 @@ import org.testcontainers.utility.DockerImageName;
 
 public class MsSqlDatabaseDialectImpl extends ContainerDatabaseDialectImpl
 {
-	private final DockerImageName imageName = DockerImageName.parse("mcr.microsoft.com/mssql/server:2019-latest");
+	private final DockerImageName imageName = DockerImageName.parse("mcr.microsoft.com/mssql/server")
+			.withTag("2019-latest");
 
 	private MSSQLServerContainer<?> container;
 

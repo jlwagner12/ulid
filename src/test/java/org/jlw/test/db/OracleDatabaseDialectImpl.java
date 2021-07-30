@@ -7,7 +7,8 @@ import org.testcontainers.utility.DockerImageName;
 
 public class OracleDatabaseDialectImpl extends ContainerDatabaseDialectImpl
 {
-	private final DockerImageName imageName = DockerImageName.parse("wnameless/oracle-xe-11g-r2:18.04-apex");
+	private final DockerImageName imageName = DockerImageName.parse("wnameless/oracle-xe-11g-r2")
+			.withTag("18.04-apex");
 
 	private OracleContainer container;
 
