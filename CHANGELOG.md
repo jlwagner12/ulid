@@ -1,3 +1,13 @@
+## [0.4.2](https://github.com/jlwagner12/ulid/compare/v0.4.1...v0.4.2) (2021-08-02)
+
+
+### Bug Fixes
+
+* added DB2 support ([9350a00](https://github.com/jlwagner12/ulid/commit/9350a003eda6b4fd158ec4f203c11f5a3b7b641e))
+* corrected image tag information ([e451776](https://github.com/jlwagner12/ulid/commit/e4517763bdf14d1569af1fabb63d960b75308f8e))
+* corrected UUID handling (there is none) ([d7cca31](https://github.com/jlwagner12/ulid/commit/d7cca31ff6c1606d8af5fc486033809d4047abfd))
+* removed bogus conditional ([ccb496a](https://github.com/jlwagner12/ulid/commit/ccb496a24ef1d8d0ca4da6f53671e9a33a19f83c))
+
 ## [0.4.1](https://github.com/jlwagner12/ulid/compare/v0.4.0...v0.4.1) (2021-07-29)
 
 
