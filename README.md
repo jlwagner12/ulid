@@ -20,6 +20,7 @@ A complete binary implementation of the [ULID specification](https://github.com/
 - ORM support
 - Fully tested against
   - H2
+  - DB2
   - Microsoft SQL Server
   - MySql
   - Oracle
@@ -75,16 +76,18 @@ Ebean is not a comprehensive JPA implementation. Instead, it attempts to provide
 a compromise between full JPA and ease of use. Regardless whether you feel it's
 successful in it's attempts, it's a great, straight-forward platform to use.
 
-It does have its idiosyncrasies, though. One of the major is the limit of regarding
+It does have its idiosyncrasies, though. One of the major is the limit regarding
 column type conversions. When mapping custom Java types, such as ULID, to
-databasse types, Ebeans limits clients to a
+database types, Ebeans limits clients to a
 [single, database-wide mapping](https://github.com/ebean-orm/ebean/issues/1777).
+
+#### Configuration
 
 This implementation allows you to set the mapping for your database when
 [configuring the Database](https://ebean.io/docs/intro/configuration/). If you
 choose to configure your database via properties files, you can set the
 property `ebean.ulid.type` to one of `"BINARY"`, `"UUID"`, `"STRING"`, or
-`"EMBEDDED"` with `"STRING"` being the default if none are specified.
+`"EMBEDDED"` with `"STRING"` being the default if none is specified.
 This is accomplished via Ebean's
 [AutoConfigure](https://ebean.io/apidoc/12/io/ebean/config/AutoConfigure.html)
 SPI.
@@ -159,6 +162,11 @@ public class Client
 |                          | STRING               | CHAR(26)                       |
 |                          | UUID                 | UUID                           |
 |                          |                      |                                |
+| **DB2**                  | BINARY               | CHAR(16) FOR BIT DATA          |
+|                          | EMBEDDED<sup>†</sup> | MSB BIGINT, LSB BIGINT         |
+|                          | STRING               | CHAR(26)                       |
+|                          | UUID<sup>‡</sup>     |                                |
+|                          |                      |                                |
 | **Microsoft SQL Server** | BINARY               | BINARY(16)                     |
 |                          | EMBEDDED<sup>†</sup> | MSB BIGINT, LSB BIGINT         |
 |                          | STRING               | CHAR(26)                       |
@@ -182,7 +190,7 @@ public class Client
 | **Sqlite**               | BINARY               | BLOB                           |
 |                          | EMBEDDED<sup>†</sup> | MSB BIGINT, LSB BIGINT         |
 |                          | STRING               | CHAR(26)                       |
-|                          | UUID                 | BLOB                           |
+|                          | UUID <sup>‡</sup>    |                                |
 
 <sup>†</sup> This mapping type requires two columns. You'll need to make certain
 to use the `@AttributeOverrides` and `@AttributeOverride` JPA annotations where

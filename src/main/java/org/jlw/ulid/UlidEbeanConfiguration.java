@@ -45,7 +45,7 @@ public class UlidEbeanConfiguration implements AutoConfigure
 
 	private static final Logger logger = LoggerFactory.getLogger(UlidEbeanConfiguration.class);
 
-	private String databaseType;
+	private final String databaseType;
 
 	public UlidEbeanConfiguration()
 	{
@@ -123,19 +123,19 @@ public class UlidEbeanConfiguration implements AutoConfigure
 	private void cleanClasses(final DatabaseConfig config, final BootupClasses classes)
 	{
 		final Set<Class<?>> library = Stream.of(ULID.class,
-				UlidBinaryAttributeConverter.class,
-				UlidEbeanConfiguration.class,
-				EbeanUlidGenerator.class,
-				UlidStringAttributeConverter.class,
-				UlidUuidAttributeConverter.class)
+						UlidBinaryAttributeConverter.class,
+						UlidEbeanConfiguration.class,
+						EbeanUlidGenerator.class,
+						UlidStringAttributeConverter.class,
+						UlidUuidAttributeConverter.class)
 				.collect(Collectors.toSet());
 
 		config.setPackages(Collections.emptyList());
 		Stream.of(classes.getAttributeConverters(),
-				classes.getEmbeddables(),
-				classes.getEntities(),
-				classes.getScalarConverters(),
-				classes.getScalarTypes())
+						classes.getEmbeddables(),
+						classes.getEntities(),
+						classes.getScalarConverters(),
+						classes.getScalarTypes())
 				.flatMap(List::stream)
 				.filter(Predicate.not(library::contains))
 				.forEach(config::addClass);
